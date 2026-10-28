@@ -55,8 +55,9 @@ function createApp({ db, dialer }) {
       const appt = store.getAppointment(id);
       if (!appt) return res.status(404).json({ error: 'Appointment not found' });
 
-      if (appt.status !== 'pending') {
-        return res.status(409).json({ error: `Appointment is already ${appt.status}` });
+      if (!store.claimForDailling(id)){
+         const current =store.getAppointment(id);
+         return res.status(409).json({error: `Appointment is already ${current.status}`})
       }
 
       const message = `Hi ${appt.customer}, this is a reminder of your appointment at ${appt.starts_at}. Press 1 to confirm or 2 to reschedule.`;
