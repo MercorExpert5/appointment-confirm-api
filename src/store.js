@@ -12,6 +12,9 @@ function createStore(db) {
   const listCallsStmt = db.prepare(
     'SELECT * FROM calls WHERE appointment_id = ? ORDER BY id'
   );
+  const claimStmt =db.prepare(
+    "UPDATE appointments SET status = 'dailling' , updated_at = datetime('now') WHERE id = ? AND status = 'pending'"
+  )
 
   return {
     createAppointment({ customer, phone, startsAt }) {
@@ -26,6 +29,11 @@ function createStore(db) {
     setStatus(id, status) {
       setStatusStmt.run(status, id);
     },
+    claimForDailling(id){
+      return claimStmt.run(id).changes ===1;
+    }
+    ,
+
 
     recordCall(appointmentId, providerRef) {
       insertCall.run(appointmentId, providerRef);
