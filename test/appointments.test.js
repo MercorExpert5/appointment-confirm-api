@@ -78,3 +78,26 @@ describe('confirm-call', () => {
     assert.equal(calls.body.count, 0);
   });
 });
+
+describe('concurrent cofirm-call', ()=>
+{
+  test('two simultaneous requests only place one call', async ()=>{
+    const t= await startTestServer();
+    const appt= await  t.createAppointment();
+
+    const results = await Promise.all([
+      t.request('POST',`/appointments/${appt.id}/confirm-call`),
+      t.request('POST',`/appointments/${appt.id}/confirm-call`)
+    ]);
+
+    const statuses=results.map((r)=>r.status).sort();
+    assert.deepEqual(statuses,[200,409])
+
+    const calls= await t.request('GET', `/appointments/${appt.id}/calls`);
+    assert.equal(calls.body.count,1);
+    assert.equal(t.dialer.placed.length,1);
+
+    await t.close();
+  })
+}
+)
