@@ -12,7 +12,7 @@ function createStore(db) {
   const listCallsStmt = db.prepare(
     'SELECT * FROM calls WHERE appointment_id = ? ORDER BY id'
   );
-
+//testing push
   return {
     createAppointment({ customer, phone, startsAt }) {
       const info = insertAppt.run(customer, phone, startsAt);
